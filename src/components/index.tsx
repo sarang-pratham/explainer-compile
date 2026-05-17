@@ -13,6 +13,7 @@ import { ProcessPipeline } from './ui/ProcessPipeline';
 import { SystemLoop } from './ui/SystemLoop';
 import { EditorialCallout } from './ui/EditorialCallout';
 import { HeroStat } from './ui/HeroStat';
+import { HighlightBox } from './ui/HighlightBox';
 import { Marker, Badge } from './ui/Typography';
 
 export const mdxComponentsRegistry = {
@@ -52,6 +53,7 @@ export const mdxComponentsRegistry = {
   SystemLoop,
   EditorialCallout,
   HeroStat,
+  HighlightBox,
   Marker,
   Badge
 };
