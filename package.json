@@ -1,16 +1,28 @@
 {
-  "name": "explainer-compile",
-  "version": "1.0.0",
-  "description": "Agent-driven interactive explainer compiler",
+  "name": "@sarang-pratham/explainer-compile",
+  "version": "0.1.0",
+  "description": "Compiles agent-generated MDX into interactive static dashboards",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "bin": {
     "explainer-compile": "./dist/cli.js"
   },
+  "files": [
+    "dist/",
+    "src/theme/",
+    "src/components/"
+  ],
+  "keywords": ["explainer", "mdx", "compiler", "agent", "dashboard"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sarang-pratham/explainer-compile.git"
+  },
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@mdx-js/esbuild": "^3.0.1",

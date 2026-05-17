@@ -9,22 +9,26 @@ const execAsync = promisify(exec);
 
 export async function compileMdx(inputFilePath: string) {
   const cwd = process.cwd();
-  const outputDir = path.join(cwd, 'explainer-output');
+  
+  // Derive topic name from input filename
+  const inputBasename = path.basename(inputFilePath, path.extname(inputFilePath));
+  const outputDir = path.join(cwd, '.explainer-output', inputBasename);
   
   await fs.ensureDir(outputDir);
   
+  // Auto-manage .gitignore
   const gitignorePath = path.join(cwd, '.gitignore');
   if (await fs.pathExists(gitignorePath)) {
     const content = await fs.readFile(gitignorePath, 'utf-8');
-    if (!content.includes('explainer-output')) {
-      await fs.appendFile(gitignorePath, '\nexplainer-output\n');
+    if (!content.includes('.explainer-output')) {
+      await fs.appendFile(gitignorePath, '\n.explainer-output/\n');
     }
   } else {
-    await fs.writeFile(gitignorePath, 'explainer-output\n');
+    await fs.writeFile(gitignorePath, '.explainer-output/\n');
   }
 
   const packageRoot = path.join(__dirname, '..');
-  const resolvedInputPath = inputFilePath.replace(/\\/g, '/');
+  const resolvedInputPath = path.resolve(inputFilePath).replace(/\\/g, '/');
   
   // 1. Generate Virtual Entry Point
   const virtualEntryPath = path.join(outputDir, '_entry.jsx');
@@ -109,7 +113,7 @@ export async function compileMdx(inputFilePath: string) {
     '<html lang="en">',
     '<head>',
     '  <meta charset="UTF-8">',
-    '  <title>Explainer Dashboard</title>',
+    '  <title>' + inputBasename + ' — Explainer</title>',
     '  <link rel="stylesheet" href="global.css">',
     '</head>',
     '<body class="antialiased">',
@@ -121,5 +125,9 @@ export async function compileMdx(inputFilePath: string) {
   
   await fs.writeFile(path.join(outputDir, 'index.html'), htmlContent);
 
-  console.log('Compilation Complete! Output saved to: ./explainer-output');
+  // 6. Clean up temp build artifacts
+  await fs.remove(virtualEntryPath);
+  await fs.remove(tempTailwindConfigPath);
+
+  console.log('Compilation Complete! Output: .explainer-output/' + inputBasename + '/');
 }

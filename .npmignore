@@ -1,0 +1,13 @@
+# Test artifacts
+test-agent/
+.explainer-output/
+
+# Agent skill (separate repo)
+agent-skills/
+
+# Design docs
+plan.md
+.DS_Store
+
+# Source maps (not needed in published package)
+*.map

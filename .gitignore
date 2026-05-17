@@ -144,3 +144,7 @@ vite.config.ts.timestamp-*
 
 explainer-output/
 test-agent/
+
+.explainer-output/
+plan.md
+.DS_Store
