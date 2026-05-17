@@ -1,6 +1,6 @@
 {
   "name": "@sarang-pratham/explainer-compile",
-  "version": "0.1.2",
+  "version": "0.1.6",
   "description": "Compiles agent-generated MDX into interactive static dashboards",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

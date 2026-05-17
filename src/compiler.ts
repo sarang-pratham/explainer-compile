@@ -34,10 +34,13 @@ export async function compileMdx(inputFilePath: string) {
   const virtualEntryPath = path.join(outputDir, '_entry.jsx');
   const componentsPath = path.join(packageRoot, 'dist', 'components', 'index.js').replace(/\\/g, '/');
 
+  const tempMdxPath = path.join(outputDir, '_content.mdx');
+  await fs.copyFile(resolvedInputPath, tempMdxPath);
+
   const virtualEntryCode = [
     "import React from 'react';",
     "import { createRoot } from 'react-dom/client';",
-    "import MDXContent from '" + resolvedInputPath + "';",
+    "import MDXContent from './_content.mdx';",
     "import { mdxComponentsRegistry } from '" + componentsPath + "';",
     "",
     "const rootElement = document.getElementById('root');",
@@ -83,10 +86,10 @@ export async function compileMdx(inputFilePath: string) {
   const tokensPath = path.join(packageRoot, 'src', 'theme', 'tokens.css');
   const cssOutPath = path.join(outputDir, 'global.css');
   
-  // Resolve the tailwindcss binary from our own package's node_modules
-  const tailwindBin = path.join(packageRoot, 'node_modules', '.bin', 'tailwindcss');
+  // Resolve the tailwindcss CLI entry directly using Node.js module resolution
+  const tailwindCliPath = require.resolve('tailwindcss/lib/cli.js');
   try {
-    await execAsync('"' + tailwindBin + '" -i "' + tokensPath + '" -o "' + cssOutPath + '" -c "' + tempTailwindConfigPath + '"');
+    await execAsync(`node "${tailwindCliPath}" -i "${tokensPath}" -o "${cssOutPath}" -c "${tempTailwindConfigPath}"`);
   } catch (err: any) {
     console.error('Tailwind build failed:', err.stdout || err.message);
     throw err;
@@ -100,6 +103,19 @@ export async function compileMdx(inputFilePath: string) {
     outfile: path.join(outputDir, 'runtime.js'),
     format: 'iife',
     plugins: [
+      {
+        name: 'npx-resolver',
+        setup(build) {
+          // Resolve React dependencies aggressively against package root
+          build.onResolve({ filter: /^(react|react-dom(\/client)?|react\/jsx-runtime)$/ }, args => {
+            try {
+              return { path: require.resolve(args.path, { paths: [packageRoot] }) };
+            } catch (e) {
+              return null;
+            }
+          });
+        }
+      },
       mdxesbuild({ jsx: true })
     ],
     loader: {
@@ -131,6 +147,7 @@ export async function compileMdx(inputFilePath: string) {
   // 6. Clean up temp build artifacts
   await fs.remove(virtualEntryPath);
   await fs.remove(tempTailwindConfigPath);
+  await fs.remove(tempMdxPath);
 
   console.log('Compilation Complete! Output: .explainer-output/' + inputBasename + '/');
 }
