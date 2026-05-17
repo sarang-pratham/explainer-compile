@@ -1,0 +1,212 @@
+<Dashboard title="LLM Architectures" subtitle="A deep dive into the design patterns powering modern large language models">
+
+<StepSection stepNumber={1} title="The Foundation: Attention and Context" tagline="How transformers revolutionized language processing">
+The modern era of large language models began with the introduction of the transformer architecture in 2017. Unlike previous RNN and LSTM models that processed sequences sequentially, transformers introduced the concept of **self-attention**, allowing each token to directly attend to all other tokens in the sequence simultaneously.
+
+This architectural decision created two fundamental capabilities that define today's LLMs:
+
+1. **Parallel processing** - tokens can be processed simultaneously rather than sequentially
+2. **Long-range dependencies** - any token can directly influence any other token, regardless of distance
+
+<Marker color="insight" importance="bold">The transformer's attention mechanism isn't just an optimization—it's a qualitative leap that enables the emergent reasoning capabilities we see in modern LLMs.</Marker>
+
+The core insight was simple yet profound: instead of trying to compress an entire sequence into a fixed-size hidden state (as RNNs did), we maintain the full context and let the model learn which parts of the context are most relevant for each prediction.
+</StepSection>
+
+<StepSection stepNumber={2} title="Decoder-Only Architecture" tagline="The dominant paradigm for autoregressive generation">
+The most common architecture for modern LLMs is the decoder-only transformer. This design focuses exclusively on the decoder portion of the original transformer, optimized for text generation tasks.
+
+Key characteristics include:
+
+- **Causal masking** - each token can only attend to previous tokens, not future ones
+- **Autoregressive generation** - text is generated one token at a time
+- **Positional encoding** - absolute or relative positions are injected since there's no inherent sequence awareness
+
+<ProcessPipeline
+  steps={[
+    { label: "Tokenize", subtext: "Text → Token IDs" },
+    { label: "Embed", subtext: "IDs → Vector Space" },
+    { label: "Decode", subtext: "Self-Attention Layers" },
+    { label: "Predict", subtext: "Next Token Distribution" },
+    { label: "Sample", subtext: "Greedy/Top-k/Top-p" }
+  ]}
+  variant="system"
+/>
+
+This architecture powers models like GPT-3/4, LLaMA, Claude, and PaLM. The decoder-only approach creates a beautifully simple loop: predict the next token, append it to the context, and repeat.
+</StepSection>
+
+<StepSection stepNumber={3} title="Encoder-Decoder Hybrid" tagline="When bidirectional understanding meets generation">
+While decoder-only models dominate generation tasks, encoder-decoder architectures excel at tasks requiring deep bidirectional understanding.
+
+The classic transformer architecture has both:
+- **Encoder** - processes input bidirectionally (can see full context)
+- **Decoder** - generates output autoregressively
+
+This hybrid shines in tasks like:
+- Translation (understand source language fully, generate target)
+- Summarization (comprehend full document, generate concise output)
+- Question answering (read context thoroughly, generate precise answer)
+
+<ArchitectureTree
+  rootName="Encoder-Decoder"
+  nodes={[
+    {
+      name: "Encoder",
+      type: "folder",
+      children: [
+        { name: "Self-Attention", type: "file", desc: "Bidirectional context" },
+        { name: "Feed Forward", type: "file", desc: "Non-linear transformations" },
+        { name: "Layer Norm", type: "file", desc: "Stabilization" }
+      ]
+    },
+    {
+      name: "Decoder",
+      type: "folder",
+      children: [
+        { name: "Self-Attention", type: "file", desc: "Causal masking" },
+        { name: "Encoder-Attention", type: "file", desc: " attends to encoder" },
+        { name: "Feed Forward", type: "file", desc: "Output generation" }
+      ]
+    }
+  ]}
+/>
+
+Models like T5, BART, and MarianMT leverage this architecture for tasks where input comprehension is as important as output generation.
+</StepSection>
+
+<StepSection stepNumber={4} title="Mixture of Experts (MoE)" tagline="Scaling without linear cost">
+As models grow to hundreds of billions of parameters, MoE architecture offers a path to scale computation without linear parameter growth.
+
+The core idea is simple but powerful:
+- **Sparse activation** - only a subset of parameters are used per input
+- **Router network** - dynamically selects which "experts" to activate
+- **Shared parameters** - some layers are shared across all experts
+
+<HighlightBox>
+Each forward pass might activate only 1-2 out of 8 experts, reducing computation while maintaining model capacity. This is the secret behind models like Mixtral 8x7B and Google's Switch Transformer.
+</HighlightBox>
+
+<ProcessPipeline
+  steps={[
+    { label: "Input", subtext: "Token embedding" },
+    { label: "Router", subtext: "Selects experts" },
+    { label: "Experts", subtext: "Parallel computation" },
+    { label: "Combine", subtext: "Weighted merge" },
+    { label: "Output", subtext: "Next token prediction" }
+  ]}
+  variant="info"
+/>
+
+MoE enables models to scale to trillions of parameters while keeping inference costs manageable. The tradeoff is increased complexity in training and routing.
+</StepSection>
+
+<StepSection stepNumber={5} title="RLHF and Alignment" tagline="Teaching models to be helpful and harmless">
+The raw power of transformer architecture isn't enough—models must be aligned with human values. This is where RLHF (Reinforcement Learning from Human Feedback) comes in.
+
+The alignment pipeline typically involves:
+
+1. **Supervised Fine-Tuning (SFT)** - train on high-quality demonstrations
+2. **Reward Modeling** - train a model to predict human preferences
+3. **RL Fine-Tuning** - use PPO to optimize for the reward signal
+
+<SystemLoop
+  nodes={[
+    { id: "sft", title: "SFT", description: "Base model training" },
+    { id: "rm", title: "Reward Model", description: "Learn human preferences" },
+    { id: "rl", title: "RL Fine-Tuning", description: "Optimize with PPO" },
+    { id: "eval", title: "Evaluation", description: "Safety and helpfulness" }
+  ]}
+  connections={[
+    { from: "sft", to: "rm" },
+    { from: "rm", to: "rl" },
+    { from: "rl", to: "eval" },
+    { from: "eval", to: "sft" }
+  ]}
+  variant="insight"
+/>
+
+This alignment process transforms raw capability into useful, safe AI. The best models aren't just big—they're big *and* aligned.
+</StepSection>
+
+<StepSection stepNumber={6} title="Efficiency Optimizations" tagline="Making giant models practical">
+Raw transformer scales poorly. Modern architectures incorporate numerous optimizations to make trillion-parameter models feasible:
+
+<Grid columns={2} gap="expressive">
+  <div>
+    <h4>Quantization</h4>
+    <p>Reduce precision from 32-bit floats to 4/8-bit integers. Can reduce memory usage by 4-8x with minimal quality loss.</p>
+  </div>
+  <div>
+    <h4>KV Caching</h4>
+    <p>Cache key-value pairs from previous attention computations to avoid redundant calculations during generation.</p>
+  </div>
+  <div>
+    <h4>FlashAttention</h4>
+    <p>Optimized attention implementation that reduces memory bandwidth and improves numerical stability.</p>
+  </div>
+  <div>
+    <h4>Speculative Decoding</h4>
+    <p>Use a smaller model to draft predictions, verified by the large model—speed up generation without quality loss.</p>
+  </div>
+</Grid>
+
+These optimizations aren't just engineering details—they're what make state-of-the-art models accessible outside of research labs.
+</StepSection>
+
+<StepSection stepNumber={7} title="Emergent Capabilities" tagline="Unexpected abilities that arise from scale">
+One of the most fascinating aspects of LLMs is that entirely new capabilities emerge as scale increases. These weren't explicitly trained for—they emerge from the model's size and training data.
+
+Examples of emergent capabilities:
+
+- **Chain-of-thought reasoning** - models learn to reason step-by-step
+- **Tool use** - models learn to call external APIs when helpful
+- **Self-correction** - models can identify and fix their own mistakes
+- **In-context learning** - learning from examples without parameter updates
+
+<Badge text="EMERGENT" variant="insight" />
+
+These capabilities suggest that scale itself is a form of algorithmic improvement. As we push larger models, we may discover entirely new forms of intelligence.
+</StepSection>
+
+<StepSection stepNumber={8} title="The Future: Beyond Standard Transformers" tagline="What comes next?">
+The transformer architecture has dominated for 6 years, but the field is already evolving. Several promising directions are emerging:
+
+<ArchitectureTree
+  rootName="Next-Gen Architectures"
+  nodes={[
+    {
+      name: "State Space Models",
+      type: "file",
+      desc: "Mamba, Hyena - linear complexity"
+    },
+    {
+      name: "Retrieval-Augmented",
+      type: "file",
+      desc: "RAG, REALM - external knowledge"
+    },
+    {
+      name: "Neuro-Symbolic",
+      type: "file",
+      desc: "LLMs + symbolic reasoning"
+    },
+    {
+      name: "Modular",
+      type: "file",
+      desc: "Specialized sub-modules"
+    }
+  ]}
+/>
+
+The next breakthrough won't necessarily be a completely new architecture—it might be a clever combination of existing ideas with new training paradigms.
+</StepSection>
+
+<EditorialCallout variant="insight" badgeText="THE BIG PICTURE">
+LLM architectures represent one of the most remarkable engineering achievements in human history. We've built systems that can reason, create, and communicate at levels approaching human intelligence—not through explicit programming, but through scale and learning.
+
+The transformer's elegance lies in its simplicity: attention, layers, and scale. Yet from these basic ingredients emerges complexity that we're only beginning to understand. As we continue scaling and improving these architectures, we're not just building better AI—we're discovering fundamental principles about intelligence itself.
+
+The future isn't just about bigger transformers—it's about transformers that are more efficient, more aligned, more capable of genuine reasoning, and more transparently understandable. We're at the beginning of a journey that will transform how we interact with computing, and perhaps what it means to be human.
+</EditorialCallout>
+
+</Dashboard>
