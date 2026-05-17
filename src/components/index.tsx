@@ -2,10 +2,18 @@ import React from 'react';
 import { Dashboard } from './layouts/Dashboard';
 import { Grid } from './layouts/Grid';
 import { TwoColumn } from './layouts/TwoColumn';
+import { StepSection } from './layouts/StepSection';
 import { MetricCard } from './ui/MetricCard';
 import { DataChart } from './ui/DataChart';
 import { InteractiveTabs } from './ui/InteractiveTabs';
 import { ArchitectureTree } from './ui/ArchitectureTree';
+import { DataArray } from './ui/DataArray';
+import { ValueStack } from './ui/ValueStack';
+import { ProcessPipeline } from './ui/ProcessPipeline';
+import { SystemLoop } from './ui/SystemLoop';
+import { EditorialCallout } from './ui/EditorialCallout';
+import { HeroStat } from './ui/HeroStat';
+import { Marker, Badge } from './ui/Typography';
 
 export const mdxComponentsRegistry = {
   // Typography overrides
@@ -25,12 +33,25 @@ export const mdxComponentsRegistry = {
   td: (props: any) => <td className="p-4 border-b border-tone-boundary/50 text-sm text-gray-300 font-mono" {...props} />,
   a: (props: any) => <a className="text-tone-cyan hover:underline hover:text-white transition-colors" {...props} />,
 
-  // Custom Primitives
+  // Layouts
   Dashboard,
   Grid,
   TwoColumn,
+  StepSection,
+
+  // UI Standard Elements
   MetricCard,
   DataChart,
-  InteractiveTabs,
   ArchitectureTree,
+  InteractiveTabs,
+  
+  // Phase 2 Infographic Primitives
+  DataArray,
+  ValueStack,
+  ProcessPipeline,
+  SystemLoop,
+  EditorialCallout,
+  HeroStat,
+  Marker,
+  Badge
 };
