@@ -4,10 +4,11 @@ import { SemanticVariant, getVariantStyles } from '../../theme/variants';
 export interface EditorialCalloutProps {
   variant?: SemanticVariant;
   badgeText?: string;
-  text: string;
+  text?: string;
+  children?: React.ReactNode;
 }
 
-export const EditorialCallout: React.FC<EditorialCalloutProps> = ({ variant = 'insight', badgeText, text }) => {
+export const EditorialCallout: React.FC<EditorialCalloutProps> = ({ variant = 'insight', badgeText, text, children }) => {
   const vStyle = getVariantStyles(variant);
   
   return (
@@ -24,7 +25,7 @@ export const EditorialCallout: React.FC<EditorialCalloutProps> = ({ variant = 'i
       )}
       
       <div className={`text-base md:text-lg leading-relaxed font-['Geist'] text-gray-200 font-medium`}>
-        {text}
+        {children || text}
       </div>
     </div>
   );

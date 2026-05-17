@@ -13,7 +13,7 @@ export const HighlightBox: React.FC<HighlightBoxProps> = ({ children, intent = '
   };
   
   return (
-    <div className={`p-4 rounded-lg border ${colors[intent]} mb-6`}>
+    <div className={`p-6 rounded-xl border ${colors[intent]} my-8 shadow-sm backdrop-blur-sm`}>
       {children}
     </div>
   );
