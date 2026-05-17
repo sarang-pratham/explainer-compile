@@ -82,8 +82,11 @@ export async function compileMdx(inputFilePath: string) {
   console.log('Building Global CSS (Tailwind)...');
   const tokensPath = path.join(packageRoot, 'src', 'theme', 'tokens.css');
   const cssOutPath = path.join(outputDir, 'global.css');
+  
+  // Resolve the tailwindcss binary from our own package's node_modules
+  const tailwindBin = path.join(packageRoot, 'node_modules', '.bin', 'tailwindcss');
   try {
-    await execAsync('npx tailwindcss -i "' + tokensPath + '" -o "' + cssOutPath + '" -c "' + tempTailwindConfigPath + '"');
+    await execAsync('"' + tailwindBin + '" -i "' + tokensPath + '" -o "' + cssOutPath + '" -c "' + tempTailwindConfigPath + '"');
   } catch (err: any) {
     console.error('Tailwind build failed:', err.stdout || err.message);
     throw err;
