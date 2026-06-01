@@ -2,6 +2,11 @@
 
 A headless MDX compiler that turns `.mdx` files into interactive static dashboards. Built for coding agents — the agent writes the MDX, the compiler handles everything else.
 
+> **Experimental / Vibe-Coded**
+>
+> This repository is an exploratory project, treat this as a proof of concept rather than a finished product.
+
+
 ## What it does
 
 You (or your coding agent) write a `.mdx` file using a set of layout and data primitives. Run the compiler, and it spits out a self-contained folder with `index.html`, `global.css`, and `runtime.js`. Open the HTML file and you've got a styled, interactive technical explainer. No framework setup, no config files, no design decisions.
